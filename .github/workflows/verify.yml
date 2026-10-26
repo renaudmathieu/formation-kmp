@@ -106,7 +106,8 @@ jobs:
       - name: Erreurs Xcode
         if: failure()
         shell: bash
-        run: grep -E "error:|warning: Run script|BUILD FAILED|e: " ci-logs/xcodebuild.log | head -80 > ci-logs/xcode-errors.log || true
+        run: |
+          grep -E "error:|warning: Run script|BUILD FAILED|e: " ci-logs/xcodebuild.log | head -80 > ci-logs/xcode-errors.log || true
       - name: Publier les journaux
         if: always()
         uses: ./.github/actions/publish-logs
