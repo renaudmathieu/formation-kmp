@@ -34,6 +34,20 @@ Pour voir ce qu'apporte un module : `git diff etape/09-etat etape/10-media-local
 
 Pour récupérer un fichier d'un checkpoint sur votre branche : `git checkout etape/07-cablage -- chemin/du/fichier`.
 
+Chaque session fige aussi les checkpoints dans des tags immuables, `<version>/socle`, `<version>/05-structure`, …, `<version>/bonus-datachannel` (par exemple `v2026.10/09-etat`) : c'est l'état exact distribué à cette session, même si les branches sont corrigées ensuite.
+
+### Maintenance des checkpoints (formateur)
+
+Les branches `etape/*` forment une chaîne linéaire au-dessus de `main`, sans merge ; le bonus part de `etape/11-connexion`. Une correction se commite sur la branche du module concerné, puis :
+
+```bash
+./scripts/checkpoints.sh restack     # reporte la correction dans toutes les branches suivantes
+./scripts/checkpoints.sh push        # force-with-lease sur les branches, plus les tags
+./scripts/checkpoints.sh tag v2026.11  # avant une session : fige l'état distribué
+```
+
+`./scripts/checkpoints.sh check` vérifie que la chaîne est intacte.
+
 ## Lancer l'application
 
 - **Android** : ouvrir le projet dans Android Studio et lancer la configuration `androidApp`.

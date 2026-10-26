@@ -14,6 +14,3 @@ xcuserdata/
 DerivedData/
 *.xcuserstate
 iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration/
-
-# Journaux de CI locaux
-ci-logs/
