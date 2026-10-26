@@ -1,0 +1,3 @@
+app_identifier("com.advisely.call")   # à remplacer par l'identifiant de votre application
+# apple_id("vous@example.com")
+# team_id("XXXXXXXXXX")
