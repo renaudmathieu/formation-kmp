@@ -36,7 +36,8 @@ class CallViewModel(
     // Module 11 : le bloc init du module 9, qui collectait repo.events(room) sur le faux signaling, est supprimé.
     // Avec le vrai client, il ouvrirait une seconde socket (et échouerait avant join()) : c'est le moteur qui
     // collecte le signaling, une seule fois, et nourrit le réducteur.
-    private val engine = CallEngine(signaling, viewModelScope, _state)   // après la déclaration de _state
+    // Module 12 : le moteur maillé remplace CallEngine. Une PeerConnection par pair, à deux comme à trois.
+    private val engine = MeshCallEngine(signaling, viewModelScope, _state)   // après la déclaration de _state
     private var callJob: Job? = null
 
     // Module 10. Idempotent : une rotation d'écran rejoue l'appel, mais pas la capture
