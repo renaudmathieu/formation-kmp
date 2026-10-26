@@ -1,0 +1,19 @@
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcuserstate
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration/
+
+# Journaux de CI locaux
+ci-logs/

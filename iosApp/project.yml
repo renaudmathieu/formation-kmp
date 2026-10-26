@@ -1,0 +1,35 @@
+# Spécification XcodeGen du projet iosApp. Le projet Xcode généré (iosApp.xcodeproj) est versionné :
+# les participants n'ont pas besoin d'XcodeGen. Pour le régénérer : brew install xcodegen && xcodegen generate
+name: iosApp
+options:
+  bundleIdPrefix: com.advisely
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  # SDK WebRTC iOS : webrtc-kmp ne l'embarque pas. Version contre laquelle webrtc-kmp 0.125.11 est compilé.
+  WebRTC:
+    url: https://github.com/webrtc-sdk/Specs
+    exactVersion: 125.6422.07
+
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+    settings:
+      base:
+        PRODUCT_NAME: iosApp
+        PRODUCT_BUNDLE_IDENTIFIER: com.advisely.call
+        INFOPLIST_FILE: iosApp/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""                   # à renseigner avec votre Apple ID dans Signing & Capabilities
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - package: WebRTC
+        product: WebRTC
+    scheme: {}
