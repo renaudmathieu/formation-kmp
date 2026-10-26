@@ -1,21 +1,30 @@
 import SwiftUI
-import Shared   // module 3 : le framework Kotlin
+import Shared
+
+// Module 8 : l'écran Compose partagé, présenté par SwiftUI comme n'importe quel écran
+struct CallView: UIViewControllerRepresentable {
+    let viewModel: CallViewModel
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        CallViewControllerKt.CallViewController(viewModel: viewModel, onNavigateBack: {})
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
 
 struct ContentView: View {
-    @State private var sdp = "…"
+    // Module 9 : le ViewModel vient de Koin (KoinIos.kt)
+    private let viewModel = KoinIosKt.callViewModel(room: SignalingConfig.shared.ROOM)
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("SDP renvoyé par Kotlin").font(.headline)
-            Text(sdp).font(.footnote.monospaced())
-            Text(describe(CallEventParticipantJoined(id: "alice")))
-        }
-        .padding()
-        .task {
-            // Module 3, atelier 2 : une fonction suspend Kotlin appelée en async depuis Swift
-            let controller = CallController()
-            sdp = (try? await controller.createOffer()) ?? "erreur"
-        }
+        CallView(viewModel: viewModel)
+            .ignoresSafeArea(.keyboard)
+            .task {
+                // Module 9, atelier 6 : avec SKIE, le StateFlow est une AsyncSequence
+                for await state in viewModel.state {
+                    print("Participants : \(state.participants.map { $0.id })")
+                }
+            }
     }
 }
 

@@ -12,6 +12,7 @@ skie = "0.10.15"
 turbine = "1.2.1"
 androidx-activity = "1.11.0"
 webrtc-kmp = "0.125.11"
+lifecycle = "2.11.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -29,6 +30,9 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 # Module 7
 webrtc-kmp = { module = "com.shepeliev:webrtc-kmp", version.ref = "webrtc-kmp" }
+# Module 9
+lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 
 # Serveur de signaling de secours (module server, côté formateur)
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
