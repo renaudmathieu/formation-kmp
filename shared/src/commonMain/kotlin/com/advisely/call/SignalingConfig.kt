@@ -8,6 +8,9 @@ package com.advisely.call
 object SignalingConfig {
     const val BASE_URL = "https://signaling.example.com"
 
+    /** Une room par binôme au module 11 : un troisième arrivant ferait renégocier la même connexion. */
+    const val ROOM = "binome-1"
+
     /** Le WebSocket suit le schéma du handshake : https donne wss, http donne ws. */
     fun webSocketUrl(baseUrl: String): String = baseUrl.replaceFirst("http", "ws")
 }

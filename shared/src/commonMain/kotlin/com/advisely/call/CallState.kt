@@ -1,15 +1,27 @@
 package com.advisely.call
 
-// Types fournis en avance du module 8 (écran d'appel). Le module 9 les complète.
+import com.shepeliev.webrtckmp.VideoTrack
+
+// Module 9 : un état, des intentions, des effets.
+
+enum class Status { Connecting, InCall, Error, Ended }
 
 data class Participant(val id: String, val displayName: String = id)
 
 data class CallState(
     val participants: List<Participant> = emptyList(),
     val micEnabled: Boolean = true,
+    val status: Status = Status.Connecting,
+    val localVideo: VideoTrack? = null,                      // rempli au module 10
+    val remoteVideos: Map<String, VideoTrack> = emptyMap(),  // rempli au module 11, par participantId
 )
 
 sealed interface CallIntent {
     data object ToggleMic : CallIntent
     data object HangUp : CallIntent
+}
+
+sealed interface CallEffect {           // événements ponctuels (non rejoués)
+    data class ShowError(val message: String) : CallEffect
+    data object NavigateBack : CallEffect
 }

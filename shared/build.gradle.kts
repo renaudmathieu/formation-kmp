@@ -36,6 +36,8 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.koin.core)           // module 7
             implementation(libs.webrtc.kmp)          // module 7 : MediaStream, VideoTrack, PeerConnection
+            implementation(libs.lifecycle.viewmodel) // module 9 : ViewModel KMP, viewModelScope
+            api(libs.koin.compose.viewmodel)         // module 9 : viewModel { } et koinViewModel, en api pour androidApp
             api(compose.runtime)                     // module 8 ; en api : androidApp en a besoin aussi
             api(compose.foundation)
             api(compose.material3)
