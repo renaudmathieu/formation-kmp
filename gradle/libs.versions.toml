@@ -11,6 +11,7 @@ koin = "4.2.2"
 skie = "0.10.15"
 turbine = "1.2.1"
 androidx-activity = "1.11.0"
+webrtc-kmp = "0.125.11"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -22,6 +23,12 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }   # module 7 (PermissionController)
+# Module 6
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+# Module 7
+webrtc-kmp = { module = "com.shepeliev:webrtc-kmp", version.ref = "webrtc-kmp" }
 
 # Serveur de signaling de secours (module server, côté formateur)
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
