@@ -39,6 +39,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Module 7 : sans ces clés, iOS plante au premier accès caméra et l'app est rejetée -->
+	<key>NSCameraUsageDescription</key>
+	<string>La caméra sert à vous montrer aux autres participants de l'appel.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Le micro sert à vous faire entendre des autres participants de l'appel.</string>
 	<!-- Requis par Compose Multiplatform sur iOS (module 8) -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>

@@ -23,12 +23,19 @@ kotlin {
         }
     }
 
+    // Module 7 : supprime l'avertissement Beta des classes expect/actual
+    compilerOptions { freeCompilerArgs.add("-Xexpect-actual-classes") }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)   // module 2
             implementation(libs.ktor.client.core)   // module 6
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
             implementation(libs.koin.core)           // module 7
+            implementation(libs.webrtc.kmp)          // module 7 : MediaStream, VideoTrack, PeerConnection
             api(compose.runtime)                     // module 8 ; en api : androidApp en a besoin aussi
             api(compose.foundation)
             api(compose.material3)
@@ -38,8 +45,12 @@ kotlin {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine)
+            implementation(libs.ktor.client.mock)    // module 6
         }
-        androidMain.dependencies { implementation(libs.ktor.client.okhttp) }
+        androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.activity)   // module 7 : PermissionController
+        }
         iosMain.dependencies { implementation(libs.ktor.client.darwin) }
     }
 }
