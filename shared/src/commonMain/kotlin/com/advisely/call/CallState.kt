@@ -14,11 +14,15 @@ data class CallState(
     val status: Status = Status.Connecting,
     val localVideo: VideoTrack? = null,                      // rempli au module 10
     val remoteVideos: Map<String, VideoTrack> = emptyMap(),  // rempli au module 11, par participantId
+    val messages: List<ChatMessage> = emptyList(),           // bonus : le chat
 )
+
+data class ChatMessage(val from: String, val text: String)
 
 sealed interface CallIntent {
     data object ToggleMic : CallIntent
     data object HangUp : CallIntent
+    data class SendChatMessage(val text: String) : CallIntent   // bonus
 }
 
 sealed interface CallEffect {           // événements ponctuels (non rejoués)

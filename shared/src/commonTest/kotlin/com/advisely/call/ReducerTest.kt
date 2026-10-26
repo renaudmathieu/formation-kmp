@@ -33,4 +33,10 @@ class ReducerTest {
         val state = CallState()
         assertSame(state, state.reduce(CallEvent.RemoteTrackAdded("alice")))
     }
+
+    @Test
+    fun ajouteUnMessageDeChat() {   // bonus
+        val next = CallState().reduce(CallEvent.ChatMessageReceived("alice", "bonjour"))
+        assertEquals(listOf(ChatMessage("alice", "bonjour")), next.messages)
+    }
 }

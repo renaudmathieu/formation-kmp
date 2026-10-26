@@ -1,5 +1,6 @@
 package com.advisely.call
 
+import com.shepeliev.webrtckmp.DataChannel
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceServer
 import com.shepeliev.webrtckmp.MediaStream
@@ -9,6 +10,7 @@ import com.shepeliev.webrtckmp.RtcConfiguration
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import com.shepeliev.webrtckmp.VideoTrack
+import com.shepeliev.webrtckmp.onDataChannel
 import com.shepeliev.webrtckmp.onIceCandidate
 import com.shepeliev.webrtckmp.onTrack
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -30,6 +33,7 @@ class CallEngine(
     private var peerId: String? = null               // le pair en face (appel à deux)
     private lateinit var peerConnection: PeerConnection
     private val pendingCandidates = mutableListOf<IceCandidate>()
+    private var chat: DataChannel? = null   // bonus : le data channel du chat
 
     suspend fun start(room: String, localStream: MediaStream) {
         // 1. Handshake : token, participantId, serveurs ICE (module 6)
@@ -62,6 +66,9 @@ class CallEngine(
             }
             .launchIn(scope)
 
+        // Bonus, côté appelé : le canal arrive par onDataChannel, avec les autres collectes, avant toute description
+        peerConnection.onDataChannel.onEach { listenChat(it) }.launchIn(scope)
+
         // 4. Une seule collecte du signaling, ici et nulle part ailleurs :
         //    incoming() est froid, une seconde collecte ouvrirait une seconde socket.
         //    Le moteur nourrit aussi le réducteur du module 9 avec join et leave.
@@ -81,6 +88,8 @@ class CallEngine(
 
     // Qui appelle ? Le présent, à réception du join du nouvel arrivant. Le nouvel arrivant attend l'offre.
     private suspend fun startCall() {
+        // Bonus, côté appelant : le canal se crée avant createOffer (DataChannel? : null si la création échoue)
+        peerConnection.createDataChannel(label = "chat")?.let { listenChat(it) }
         val offer = peerConnection.createOffer(OfferAnswerOptions())
         peerConnection.setLocalDescription(offer)
         signaling.send(SignalMessage(type = "offer", from = me, to = peerId, sdp = offer.sdp))
@@ -115,6 +124,25 @@ class CallEngine(
                 peerConnection.close()           // appel à deux : on raccroche
             }
         }
+    }
+
+    // Bonus : le data channel, troisième type de flux, sur la même connexion négociée
+    private fun listenChat(channel: DataChannel) {
+        chat = channel
+        channel.onMessage                                  // Flow<ByteArray>
+            .map { it.decodeToString() }
+            .onEach { text ->
+                val from = peerId ?: return@onEach
+                state.update { it.reduce(CallEvent.ChatMessageReceived(from, text)) }
+            }
+            .launchIn(scope)
+    }
+
+    // Envoi, appelé par le ViewModel ; l'émetteur voit aussi son propre message
+    fun sendChat(text: String) {
+        if (!::me.isInitialized) return                    // pas encore dans l'appel
+        chat?.send(text.encodeToByteArray())
+        state.update { it.reduce(CallEvent.ChatMessageReceived(me, text)) }
     }
 
     private suspend fun flushPendingCandidates() {
