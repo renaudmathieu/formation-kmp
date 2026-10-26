@@ -8,7 +8,7 @@ plugins {
 kotlin {
     android {
         namespace = "com.advisely.call.shared"
-        compileSdk = 36
+        compileSdk = 37   // Compose Multiplatform 1.12 tire androidx.compose 1.12, qui exige 37
         minSdk = 24
         withHostTest {}   // tests hôtes : sans eux, commonTest ne tourne pas sous Linux (module 13)
     }
