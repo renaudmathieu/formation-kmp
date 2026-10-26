@@ -1,0 +1,5 @@
+# Dépôt Git privé qui contient les certificats chiffrés (à créer avant la démo)
+git_url("https://github.com/votre-organisation/certificats-ios.git")
+storage_mode("git")
+type("appstore")
+app_identifier(["com.advisely.call"])

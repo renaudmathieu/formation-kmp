@@ -1,0 +1,23 @@
+# Module 13 : Fastlane automatise le build et la livraison, Match centralise certificats et profils.
+# Les secrets (MATCH_PASSWORD, accès au dépôt de certificats, clé App Store Connect) vivent dans
+# les secrets GitHub Actions, jamais dans le dépôt.
+default_platform(:ios)
+
+platform :ios do
+  desc "Archive signée de l'application (CI)"
+  lane :build do
+    setup_ci                                   # trousseau temporaire sur le runner
+    match(type: "appstore", readonly: true)    # certificats et profils depuis le dépôt Match
+    build_app(
+      project: "iosApp/iosApp.xcodeproj",
+      scheme: "iosApp",
+      export_method: "app-store"
+    )
+  end
+
+  desc "Envoi sur TestFlight"
+  lane :beta do
+    build
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+end
