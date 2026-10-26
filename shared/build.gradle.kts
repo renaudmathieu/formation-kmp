@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework   // module 12
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)   // plugin Android KMP library (AGP 9)
@@ -15,11 +17,15 @@ kotlin {
         withHostTest {}   // tests hôtes : sans eux, commonTest ne tourne pas sous Linux (module 13)
     }
 
-    // Module 3 : le framework iOS consommé par Xcode
+    // Module 3 : le framework iOS consommé par Xcode.
+    // Module 12 : on MODIFIE ce bloc pour produire aussi un XCFramework, on n'en ajoute pas un second.
+    // ./gradlew :shared:assembleSharedXCFramework
+    val xcf = XCFramework("Shared")
     listOf(iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "Shared"   // nom du framework vu par Xcode
-            isStatic = true        // framework statique, recommandé pour démarrer
+            isStatic = true        // statique : avec webrtc-kmp, un framework dynamique ne se lie plus sans linkerOpts
+            xcf.add(this)          // seule ligne ajoutée au bloc du module 3
         }
     }
 

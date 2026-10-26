@@ -11,6 +11,12 @@ object SignalingConfig {
     /** Une room par binôme au module 11 : un troisième arrivant ferait renégocier la même connexion. */
     const val ROOM = "binome-1"
 
+    /**
+     * Module 12, démo de l'appel à trois : le formateur passe MESH à true sur ses appareils.
+     * Le moteur maillé (MeshCallEngine) ouvre une PeerConnection par pair, via CallSession.
+     */
+    const val MESH = false
+
     /** Le WebSocket suit le schéma du handshake : https donne wss, http donne ws. */
     fun webSocketUrl(baseUrl: String): String = baseUrl.replaceFirst("http", "ws")
 }

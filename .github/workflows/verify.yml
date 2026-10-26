@@ -95,7 +95,10 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew --stacktrace :shared:compileKotlinIosSimulatorArm64 2>&1 | tee ci-logs/kotlin-ios.log
+          TASKS=":shared:compileKotlinIosSimulatorArm64"
+          # À partir du module 12 : l'XCFramework (debug, pour rester rapide)
+          if grep -q "XCFramework(" shared/build.gradle.kts; then TASKS="$TASKS :shared:assembleSharedDebugXCFramework"; fi
+          ./gradlew --stacktrace $TASKS 2>&1 | tee ci-logs/kotlin-ios.log
       - name: Build de l'app iOS (simulateur)
         shell: bash
         run: |

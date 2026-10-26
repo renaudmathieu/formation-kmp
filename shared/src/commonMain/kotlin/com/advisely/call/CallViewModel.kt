@@ -35,6 +35,7 @@ class CallViewModel(
     // Avec le vrai client, il ouvrirait une seconde socket (et échouerait avant join()) : c'est le moteur qui
     // collecte le signaling, une seule fois, et nourrit le réducteur.
     private val engine = CallEngine(signaling, viewModelScope, _state)   // après la déclaration de _state
+    private val meshEngine = MeshCallEngine(signaling, viewModelScope, _state)   // module 12 : démo à trois
     private var callJob: Job? = null
 
     // Module 10. Idempotent : une rotation d'écran rejoue l'appel, mais pas la capture
@@ -59,7 +60,9 @@ class CallViewModel(
         callJob = viewModelScope.launch {
             startCamera().join()                           // module 10 : attend la réponse à la permission
             val stream = localStream ?: return@launch      // refusé : ShowError a déjà été émis
-            runCatching { engine.start(room, stream) }.onFailure { e ->
+            runCatching {
+                if (SignalingConfig.MESH) meshEngine.start(room, stream) else engine.start(room, stream)
+            }.onFailure { e ->
                 _state.update { it.copy(status = Status.Error) }   // serveur injoignable : un message, pas un plantage
                 _effects.emit(CallEffect.ShowError("Connexion au signaling impossible : ${e.message}"))
             }
@@ -68,6 +71,7 @@ class CallViewModel(
 
     private fun hangUp() {
         engine.stop()
+        meshEngine.stop()
         camera.stop()
     }
 
