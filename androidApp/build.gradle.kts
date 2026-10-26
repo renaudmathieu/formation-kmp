@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.advisely.call.android"
-    compileSdk = 36
+    compileSdk = 37   // Compose Multiplatform 1.12 tire androidx.compose 1.12, qui exige 37
 
     defaultConfig {
         applicationId = "com.advisely.call"
