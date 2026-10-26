@@ -40,9 +40,12 @@ check() {
 
 restack() {
   [ -z "$(git status --porcelain)" ] || ko "arbre de travail non propre"
-  # Base de chaque branche AVANT de déplacer quoi que ce soit : le point où elle a quitté la précédente
+  # Base de chaque branche AVANT de déplacer quoi que ce soit : le point où elle a quitté la précédente.
+  # --fork-point retrouve l'ancien sommet dans le reflog, même si la précédente a été amendée.
   local bases=()
-  while read -r prev next; do bases+=("$(git merge-base "$prev" "$next")"); done < <(pairs)
+  while read -r prev next; do
+    bases+=("$(git merge-base --fork-point "$prev" "$next" || git merge-base "$prev" "$next")")
+  done < <(pairs)
   local i=0 start; start=$(git branch --show-current)
   while read -r prev next; do
     git rebase -q --onto "$prev" "${bases[i]}" "$next" \
