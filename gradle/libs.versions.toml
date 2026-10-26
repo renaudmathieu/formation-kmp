@@ -8,6 +8,7 @@ coroutines = "1.11.0"
 serialization = "1.11.0"
 ktor = "3.4.0"
 koin = "4.2.2"
+skie = "0.10.15"
 turbine = "1.2.1"
 androidx-activity = "1.11.0"
 
@@ -39,3 +40,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+skie = { id = "co.touchlab.skie", version.ref = "skie" }
