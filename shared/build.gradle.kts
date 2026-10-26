@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)   // plugin Android KMP library (AGP 9)
+    alias(libs.plugins.kotlin.serialization)                   // module 2
+    alias(libs.plugins.skie)                                   // module 3
     alias(libs.plugins.compose.multiplatform)                  // UI partagée (module 8)
     alias(libs.plugins.compose.compiler)
 }
@@ -12,12 +14,19 @@ kotlin {
         minSdk = 24
         withHostTest {}   // tests hôtes : sans eux, commonTest ne tourne pas sous Linux (module 13)
     }
-    iosArm64()            // le bloc binaries.framework { … } est ajouté au module 3
-    iosSimulatorArm64()
+
+    // Module 3 : le framework iOS consommé par Xcode
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Shared"   // nom du framework vu par Xcode
+            isStatic = true        // framework statique, recommandé pour démarrer
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)   // module 2
             implementation(libs.ktor.client.core)   // module 6
             implementation(libs.koin.core)           // module 7
             api(compose.runtime)                     // module 8 ; en api : androidApp en a besoin aussi
