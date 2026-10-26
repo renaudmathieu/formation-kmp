@@ -37,5 +37,6 @@ func describe(_ event: CallEvent) -> String {
     case .remoteTrackAdded(let e): return "piste distante de \(e.participantId)"
     case .callEnded: return "appel terminé"
     case .error(let e): return "erreur : \(e.message ?? "inconnue")"
+    case .chatMessageReceived(let e): return "\(e.from) : \(e.text)"   // bonus : nouveau cas, sinon le switch ne compile plus
     }
 }

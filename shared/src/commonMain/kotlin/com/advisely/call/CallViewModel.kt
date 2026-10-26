@@ -87,6 +87,8 @@ class CallViewModel(
                 hangUp()                       // module 11 : à la place de repo.hangUp()
                 _effects.emit(CallEffect.NavigateBack)
             }
+            // Bonus : le when sur une interface scellée doit rester exhaustif
+            is CallIntent.SendChatMessage -> engine.sendChat(intent.text)
         }
     }
 }

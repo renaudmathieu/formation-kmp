@@ -6,5 +6,7 @@ fun CallState.reduce(event: CallEvent): CallState = when (event) {
     is CallEvent.ParticipantLeft   -> copy(participants = participants.filterNot { it.id == event.id })
     is CallEvent.Error             -> copy(status = Status.Error)
     CallEvent.CallEnded            -> copy(status = Status.Ended)
+    is CallEvent.ChatMessageReceived ->                        // bonus, avant la branche else
+        copy(messages = messages + ChatMessage(event.from, event.text))
     else                           -> this
 }
