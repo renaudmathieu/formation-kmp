@@ -10,14 +10,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// Module 9 : la source de vérité de l'écran d'appel. Module 10 : le média local.
+// Module 9 : la source de vérité de l'écran d'appel. Module 10 : le média local. Module 11 : la connexion.
 class CallViewModel(
     private val repo: CallRepository,
+    private val signaling: SignalingClient,          // module 11
     private val permissions: PermissionController,   // module 10
     private val camera: CameraController,            // module 10
     private val room: String,
@@ -32,12 +31,11 @@ class CallViewModel(
     private var localStream: MediaStream? = null   // gardé pour le module 11
     private var cameraJob: Job? = null
 
-    init {
-        // le réducteur : chaque événement produit un nouvel état
-        repo.events(room)
-            .onEach { event -> _state.update { it.reduce(event) } }
-            .launchIn(viewModelScope)
-    }
+    // Module 11 : le bloc init du module 9, qui collectait repo.events(room) sur le faux signaling, est supprimé.
+    // Avec le vrai client, il ouvrirait une seconde socket (et échouerait avant join()) : c'est le moteur qui
+    // collecte le signaling, une seule fois, et nourrit le réducteur.
+    private val engine = CallEngine(signaling, viewModelScope, _state)   // après la déclaration de _state
+    private var callJob: Job? = null
 
     // Module 10. Idempotent : une rotation d'écran rejoue l'appel, mais pas la capture
     fun startCamera(): Job = cameraJob ?: viewModelScope.launch {
@@ -54,6 +52,27 @@ class CallViewModel(
         _state.update { it.copy(localVideo = stream.videoTracks.first()) }
     }.also { cameraJob = it }
 
+    // À appeler à l'entrée de l'écran : attend la caméra, puis rejoint l'appel.
+    // Idempotent : une rotation d'écran ne rouvre ni caméra ni socket.
+    fun joinCall() {
+        if (callJob != null) return
+        callJob = viewModelScope.launch {
+            startCamera().join()                           // module 10 : attend la réponse à la permission
+            val stream = localStream ?: return@launch      // refusé : ShowError a déjà été émis
+            runCatching { engine.start(room, stream) }.onFailure { e ->
+                _state.update { it.copy(status = Status.Error) }   // serveur injoignable : un message, pas un plantage
+                _effects.emit(CallEffect.ShowError("Connexion au signaling impossible : ${e.message}"))
+            }
+        }
+    }
+
+    private fun hangUp() {
+        engine.stop()
+        camera.stop()
+    }
+
+    override fun onCleared() = hangUp()   // l'écran est détruit (Activity finie) : on libère tout
+
     fun onIntent(intent: CallIntent) {
         when (intent) {
             // le micro affiché doit être le micro réel
@@ -63,8 +82,7 @@ class CallViewModel(
                 _state.update { it.copy(micEnabled = enabled) }
             }
             CallIntent.HangUp -> viewModelScope.launch {
-                camera.stop()                  // libère caméra et micro
-                repo.hangUp()
+                hangUp()                       // module 11 : à la place de repo.hangUp()
                 _effects.emit(CallEffect.NavigateBack)
             }
         }

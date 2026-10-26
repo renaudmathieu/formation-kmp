@@ -24,7 +24,7 @@ fun CallRoute(viewModel: CallViewModel, onNavigateBack: () -> Unit = {}) {
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
-        viewModel.startCamera()   // module 10 : à l'entrée dans l'écran d'appel (idempotent)
+        viewModel.joinCall()   // module 11 : caméra puis appel, à l'entrée dans l'écran (idempotent)
         viewModel.effects.collect { effect ->
             when (effect) {
                 is CallEffect.ShowError -> snackbar.showSnackbar(effect.message)
