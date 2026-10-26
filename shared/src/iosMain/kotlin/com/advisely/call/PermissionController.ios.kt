@@ -13,8 +13,7 @@ actual class PermissionController actual constructor() {
     actual suspend fun ensureCameraAndMic(): Boolean =
         request(AVMediaTypeVideo) && request(AVMediaTypeAudio)
 
-    // Les constantes AVMediaType* arrivent nullables depuis Objective-C : d'où le paramètre nullable.
-    private suspend fun request(type: AVMediaType?): Boolean = suspendCancellableCoroutine { cont ->
-        AVCaptureDevice.requestAccessForMediaType(checkNotNull(type)) { granted -> cont.resume(granted) }
+    private suspend fun request(type: AVMediaType): Boolean = suspendCancellableCoroutine { cont ->
+        AVCaptureDevice.requestAccessForMediaType(type) { granted -> cont.resume(granted) }
     }
 }
