@@ -28,10 +28,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CallScreen(state: CallState, onIntent: (CallIntent) -> Unit) {
     Column(Modifier.fillMaxSize()) {
-        ParticipantGrid(
-            participants = state.participants,
-            modifier = Modifier.weight(1f)
-        )
+        ParticipantGrid(state = state, modifier = Modifier.weight(1f))   // module 10 : la grille reçoit les pistes
         CallControls(
             micEnabled = state.micEnabled,
             onToggleMic = { onIntent(CallIntent.ToggleMic) },
@@ -40,15 +37,23 @@ fun CallScreen(state: CallState, onIntent: (CallIntent) -> Unit) {
     }
 }
 
+// Module 10 : la grille affiche les pistes vidéo de l'état. Pour l'instant une seule tuile, la nôtre.
 @Composable
-fun ParticipantGrid(participants: List<Participant>, modifier: Modifier = Modifier) {
+fun ParticipantGrid(state: CallState, modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(160.dp),
         modifier = modifier.padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(participants, key = { it.id }) { participant ->
+        state.localVideo?.let { track ->
+            item(key = "local") { VideoRenderer(track, Modifier.aspectRatio(3f / 4f), mirror = true) }
+        }
+        items(state.remoteVideos.entries.toList(), key = { it.key }) { (_, track) ->
+            VideoRenderer(track, Modifier.aspectRatio(3f / 4f))   // module 11
+        }
+        // Participants annoncés par le signaling, sans vidéo (encore) : une tuile avec leur nom
+        items(state.participants.filter { it.id !in state.remoteVideos }, key = { "nom-" + it.id }) { participant ->
             Box(
                 Modifier
                     .aspectRatio(3f / 4f)
