@@ -3,6 +3,8 @@ package com.advisely.call
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shepeliev.webrtckmp.MediaStream
+import com.shepeliev.webrtckmp.audioTracks   // extensions de MediaStream : à importer
+import com.shepeliev.webrtckmp.videoTracks
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
